@@ -44,174 +44,116 @@ def aba_calculos():
 
     escolha = st.selectbox("Escolha o tipo de cálculo:", opcoes)
 
-    if escolha == "Velocidade Média":
-        st.subheader("Velocidade Média: v = Δs / Δt")
-        distancia = st.number_input("Digite a distância (Δs) em metros:", step=1.0)
-        tempo = st.number_input("Digite o tempo (Δt) em segundos:", step=1.0)
-        if st.button("Calcular Velocidade"):
-            if tempo != 0:
-                velocidade = distancia / tempo
-                steps = f"""
-                ## Cálculo da Velocidade Média (m/s)
-                ### Fórmula
-                $$v = \frac{{\Delta s}}{{\Delta t}}$$
-                ### Substituindo os valores
-                $$v = \frac{{{distancia}}}{{{tempo}}}$$
-                ### Resultado
-                $$v = {velocidade:.2f} \\text{{ m/s}}$$
-                """
-                st.markdown(steps)
-                st.success(f"A velocidade média é {velocidade:.2f} m/s")
-            else:
-                st.error("O tempo não pode ser zero!")
-
-    elif escolha == "Força Resultante":
-        st.subheader("Força Resultante: F = m * a")
-        massa = st.number_input("Digite a massa (m) em kg:", step=1.0)
-        aceleracao = st.number_input("Digite a aceleração (a) em m/s²:", step=1.0)
-        if st.button("Calcular Força"):
-            forca = massa * aceleracao
+if escolha == "Velocidade Média":
+    st.subheader("Velocidade Média: v = Δs / Δt")
+    distancia = st.number_input("Digite a distância (Δs) em metros:", step=1.0)
+    tempo = st.number_input("Digite o tempo (Δt) em segundos:", step=1.0)
+    if st.button("Calcular Velocidade"):
+        if tempo != 0:
+            velocidade = distancia / tempo
             steps = f"""
-            ## Cálculo da Força Resultante (N)
+            ## Cálculo da Velocidade Média (m/s)
+
             ### Fórmula
-            $$F = m \cdot a$$
+
+            $$v = \frac{{\Delta s}}{{\Delta t}}$$
+
             ### Substituindo os valores
-            $$F = {massa} \cdot {aceleracao}$$
+
+            $$v = \frac{{{distancia}}}{{{tempo}}}$$
+
             ### Resultado
-            $$F = {forca:.2f} \\text{{ N}}$$
+
+            $$v = {velocidade:.2f} \text{{ m/s}}$$
             """
             st.markdown(steps)
-            st.success(f"A força resultante é {forca:.2f} N")
+            st.success(f"A velocidade média é {velocidade:.2f} m/s")
+        else:
+            st.error("O tempo não pode ser zero!")
 
-    elif escolha == "Fórmula de Bhaskara":
-        st.subheader("Bhaskara: ax² + bx + c = 0")
-        a = st.number_input("Digite o valor de a:")
-        b = st.number_input("Digite o valor de b:")
-        c = st.number_input("Digite o valor de c:")
-        if st.button("Calcular Bhaskara"):
-            delta = b**2 - 4*a*c
-            if delta < 0:
-                st.warning("Não existem raízes reais.")
-            else:
-                x1 = (-b + delta**0.5) / (2*a)
-                x2 = (-b - delta**0.5) / (2*a)
-                steps = f"""
-                ## Cálculo de Bhaskara
-                ### Fórmula
-                $$x = \frac{{-b \pm \sqrt{{\Delta}}}}{{2a}}$$
-                ### Substituindo os valores
-                $$\Delta = {b}^2 - 4 \cdot {a} \cdot {c} = {delta}$$
-                $$x_1 = \frac{{{-b} + \sqrt{{{delta}}}}}{{2 \cdot {a}}} = {x1:.2f}$$
-                $$x_2 = \frac{{{-b} - \sqrt{{{delta}}}}}{{2 \cdot {a}}} = {x2:.2f}$$
-                """
-                st.markdown(steps)
-                st.success(f"x₁ = {x1:.2f}, x₂ = {x2:.2f}")
+# Força Resultante
+elif escolha == "Força Resultante":
+    st.subheader("Força Resultante: F = m * a")
+    massa = st.number_input("Digite a massa (m) em kg:", step=1.0)
+    aceleracao = st.number_input("Digite a aceleração (a) em m/s²:", step=1.0)
+    if st.button("Calcular Força"):
+        forca = massa * aceleracao
+        steps = f"""
+        ## Cálculo da Força Resultante (N)
 
-    elif escolha == "Corrente Elétrica":
-        st.subheader("Corrente Elétrica: I = Q / Δt")
-        carga = st.number_input("Digite a carga elétrica (Q) em Coulombs:", step=1.0)
-        tempo = st.number_input("Digite o tempo (Δt) em segundos:", step=1.0)
-        if st.button("Calcular Corrente"):
-            if tempo != 0:
-                corrente = carga / tempo
-                steps = f"""
-                ## Cálculo da Corrente Elétrica (A)
-                ### Fórmula
-                $$I = \frac{{Q}}{{\Delta t}}$$
-                ### Substituindo os valores
-                $$I = \frac{{{carga}}}{{{tempo}}}$$
-                ### Resultado
-                $$I = {corrente:.2f} \\text{{ A}}$$
-                """
-                st.markdown(steps)
-                st.success(f"A corrente elétrica é {corrente:.2f} A")
-            else:
-                st.error("O tempo não pode ser zero!")
+        ### Fórmula
 
-    elif escolha == "Força Gravitacional":
-        st.subheader("Força Gravitacional: F = G * (m1 * m2) / d²")
-        G = 6.67430e-11
-        m1 = st.number_input("Massa 1 (kg):", step=1.0)
-        m2 = st.number_input("Massa 2 (kg):", step=1.0)
-        distancia = st.number_input("Distância (m):", step=1.0)
-        if st.button("Calcular Força Gravitacional"):
-            if distancia != 0:
-                Fg = G * (m1 * m2) / distancia**2
-                steps = f"""
-                ## Cálculo da Força Gravitacional (N)
-                ### Fórmula
-                $$F = G \cdot \frac{{m_1 \cdot m_2}}{{d^2}}$$
-                ### Substituindo os valores
-                $$F = {G:.4e} \cdot \frac{{{m1} \cdot {m2}}}{{{distancia}^2}}$$
-                ### Resultado
-                $$F = {Fg:.4e} \\text{{ N}}$$
-                """
-                st.markdown(steps)
-                st.success(f"A força gravitacional é {Fg:.4e} N")
-            else:
-                st.error("A distância não pode ser zero!")
+        $$F = m \cdot a$$
 
-    elif escolha == "Torricelli":
-        st.subheader("Torricelli: v² = v₀² + 2*a*Δs")
-        v0 = st.number_input("Velocidade inicial (v₀):", step=1.0)
-        a = st.number_input("Aceleração (a):", step=1.0)
-        s = st.number_input("Deslocamento (Δs):", step=1.0)
-        if st.button("Calcular Velocidade Final"):
-            vf2 = v0**2 + 2*a*s
-            if vf2 >= 0:
-                vf = vf2 ** 0.5
-                steps = f"""
-                ## Cálculo de Torricelli
-                ### Fórmula
-                $$v^2 = v_0^2 + 2a\Delta s$$
-                ### Substituindo os valores
-                $$v^2 = {v0}^2 + 2 \cdot {a} \cdot {s}$$
-                ### Resultado
-                $$v = {vf:.2f} \\text{{ m/s}}$$
-                """
-                st.markdown(steps)
-                st.success(f"A velocidade final é {vf:.2f} m/s")
-            else:
-                st.warning("Resultado inválido (velocidade imaginária).")
+        ### Substituindo os valores
 
-    elif escolha == "Carga Elétrica":
-        st.subheader("Carga Elétrica: Q = n * e")
-        n = st.number_input("Número de elétrons (n):", step=1.0)
-        e = 1.6e-19
-        if st.button("Calcular Carga"):
-            Q = n * e
+        $$F = {massa} \cdot {aceleracao}$$
+
+        ### Resultado
+
+        $$F = {forca:.2f} \text{{ N}}$$
+        """
+        st.markdown(steps)
+        st.success(f"A força resultante é {forca:.2f} N")
+
+# Bhaskara
+elif escolha == "Fórmula de Bhaskara":
+    st.subheader("Bhaskara: ax² + bx + c = 0")
+    a = st.number_input("Digite o valor de a:")
+    b = st.number_input("Digite o valor de b:")
+    c = st.number_input("Digite o valor de c:")
+    if st.button("Calcular Bhaskara"):
+        delta = b**2 - 4*a*c
+        if delta < 0:
+            st.warning("Não existem raízes reais.")
+        else:
+            x1 = (-b + delta**0.5) / (2*a)
+            x2 = (-b - delta**0.5) / (2*a)
             steps = f"""
-            ## Cálculo da Carga Elétrica (C)
+            ## Cálculo das raízes da equação quadrática
+
             ### Fórmula
-            $$Q = n \cdot e$$
+
+            $$x = \frac{{-b \pm \sqrt{{\Delta}}}}{{2a}}$$
+
             ### Substituindo os valores
-            $$Q = {n} \cdot {e}$$
-            ### Resultado
-            $$Q = {Q:.4e} \\text{{ C}}$$
+
+            $$\Delta = {b}^2 - 4 \cdot {a} \cdot {c} = {delta}$$
+
+            $$x_1 = \frac{{-{b} + \sqrt{{{delta}}}}}{{2 \cdot {a}}} = {x1:.2f}$$
+
+            $$x_2 = \frac{{-{b} - \sqrt{{{delta}}}}}{{2 \cdot {a}}} = {x2:.2f}$$
             """
             st.markdown(steps)
-            st.success(f"A carga elétrica é {Q:.4e} C")
+            st.success(f"x₁ = {x1:.2f}, x₂ = {x2:.2f}")
 
-    elif escolha == "Tempo":
-        st.subheader("Tempo: t = d / v")
-        d = st.number_input("Distância (d):", step=1.0)
-        v = st.number_input("Velocidade (v):", step=1.0)
-        if st.button("Calcular Tempo"):
-            if v != 0:
-                t = d / v
-                steps = f"""
-                ## Cálculo do Tempo (s)
-                ### Fórmula
-                $$t = \frac{{d}}{{v}}$$
-                ### Substituindo os valores
-                $$t = \frac{{{d}}}{{{v}}}$$
-                ### Resultado
-                $$t = {t:.2f} \\text{{ s}}$$
-                """
-                st.markdown(steps)
-                st.success(f"O tempo é {t:.2f} s")
-            else:
-                st.error("A velocidade não pode ser zero!")
+# Corrente Elétrica
+elif escolha == "Corrente Elétrica":
+    st.subheader("Corrente Elétrica: I = Q / Δt")
+    carga = st.number_input("Digite a carga elétrica (Q) em Coulombs:", step=1.0)
+    tempo = st.number_input("Digite o tempo (Δt) em segundos:", step=1.0)
+    if st.button("Calcular Corrente"):
+        if tempo != 0:
+            corrente = carga / tempo
+            steps = f"""
+            ## Cálculo da Corrente Elétrica (A)
+
+            ### Fórmula
+
+            $$I = \frac{{Q}}{{\Delta t}}$$
+
+            ### Substituindo os valores
+
+            $$I = \frac{{{carga}}}{{{tempo}}}$$
+
+            ### Resultado
+
+            $$I = {corrente:.2f} \text{{ A}}$$
+            """
+            st.markdown(steps)
+            st.success(f"A corrente elétrica é {corrente:.2f} A")
+        else:
+            st.error("O tempo não pode ser zero!")
 
 
 # ---------------- Autenticação ---------------- #
