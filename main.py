@@ -66,7 +66,7 @@ def register():
     password = st.text_input("Nova senha", type="password")
     if st.button("Registrar"):
         users = load_users()
-        if any(user["username"] == username for user in users.values()):
+        if any(user.get("username") == username for user in users.values() if isinstance(user, dict)):
             st.error("Usuário já existe.")
         else:
             user_id = str(uuid.uuid4())
@@ -80,6 +80,7 @@ def register():
             }
             save_users(users)
             st.success("Registrado com sucesso! Faça login.")
+
 
 def logout():
     if st.button("Sair"):
