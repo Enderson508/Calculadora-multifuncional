@@ -53,13 +53,13 @@ def login():
     password = st.text_input("Senha", type="password")
     if st.button("Entrar"):
         users = load_users()
-    for user in users.values():
-        if isinstance(user, dict) and user.get("username") == username and check_password(password, user.get("password", "")):
-            st.session_state["logged_in"] = True
-            st.session_state["username"] = username
-            st.success("Login bem-sucedido!")
-            st.rerun()
-            return
+        for user in users.values():
+            if isinstance(user, dict) and user.get("username") == username and check_password(password, user.get("password", "")):
+                st.session_state["logged_user"] = user  # Aqui guarda o dicionário inteiro do usuário logado
+                st.success("Login bem-sucedido!")
+                st.rerun()
+                return
+        st.error("Usuário ou senha incorretos.")
 
 def register():
     st.subheader("Registrar")
