@@ -365,23 +365,49 @@ def show_perfil(user):
         else:
             st.error("ID de usuário inválido.")
 
-def show_notificacoes(user):
-    st.title("Notificações")
-    users = load_users()
-    if not user["notificacoes"]:
-        st.info("Sem notificações.")
-    else:
+def show_notificacoes(logged_user):
+    st.subheader("Notificações")
+
+    with open("users.json", "r") as file:
+        users = json.load(file)
+
+    user = users.get(logged_user)
+
+    if user and "notificacoes" in user and user["notificacoes"]:
         for solicitante_id in user["notificacoes"]:
-            nome = users.get(solicitante_id, {}).get("username", "Desconhecido")
-            col1, col2 = st.columns(2)
-            col1.write(f"{nome} quer ser seu amigo.")
-            if col2.button("Aceitar", key=solicitante_id):
-                users[user["id"]]["amigos"].append(solicitante_id)
-                users[solicitante_id]["amigos"].append(user["id"])
-                users[user["id"]]["notificacoes"].remove(solicitante_id)
-                save_users(users)
-                st.success(f"Você e {nome} agora são amigos!")
-                st.rerun()
+            solicitante = users.get(solicitante_id)
+            if solicitante:
+                col1, col2 = st.columns([3, 1])
+                with col1:
+                    st.write(f"**{solicitante['username']}** quer ser seu amigo.")
+                with col2:
+                    aceitar = st.button("Aceitar", key=f"aceitar_{solicitante_id}")
+                    recusar = st.button("Recusar", key=f"recusar_{solicitante_id}_")
+
+                if aceitar:
+                    if solicitante_id not in user.get("amigos", []):
+                        user.setdefault("amigos", []).append(solicitante_id)
+                    if logged_user not in solicitante.get("amigos", []):
+                        solicitante.setdefault("amigos", []).append(logged_user)
+
+                    # Remover notificação com verificação
+                    if solicitante_id in user["notificacoes"]:
+                        user["notificacoes"].remove(solicitante_id)
+
+                    st.success(f"Você aceitou {solicitante['username']} como amigo.")
+                    st.rerun()
+
+                elif recusar:
+                    if solicitante_id in user["notificacoes"]:
+                        user["notificacoes"].remove(solicitante_id)
+
+                    st.info(f"Você recusou {solicitante['username']}.")
+                    st.rerun()
+    else:
+        st.write("Você não possui notificações no momento.")
+
+    with open("users.json", "w") as file:
+        json.dump(users, file, indent=4)
 
 # ---------------- Execução Principal ---------------- #
 
