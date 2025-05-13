@@ -330,7 +330,9 @@ def logout():
 
 def show_perfil(user):
     st.title(f"Perfil: {user['username']}")
-
+    user_id = user_data.get("id", "ID não encontrado")
+    
+    st.subheader(f"ID: {user_id}")
     # Anotação
     anotacao = st.text_area("Anotação pessoal:", value=user.get("anotacao", ""))
     if st.button("Salvar anotação"):
