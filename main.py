@@ -371,10 +371,12 @@ def show_notificacoes(logged_user):
     with open("users.json", "r") as file:
         users = json.load(file)
 
-    # Verificação robusta do usuário logado
+    # Verificação do usuário logado
     user = next((u for u in users if isinstance(u, dict) and u.get("id") == logged_user), None)
 
     if user and isinstance(user.get("notificacoes", []), list) and user["notificacoes"]:
+        notificacoes_para_remover = []
+
         for solicitante_id in user["notificacoes"]:
             solicitante = next((u for u in users if isinstance(u, dict) and u.get("id") == solicitante_id), None)
             if solicitante:
@@ -388,22 +390,27 @@ def show_notificacoes(logged_user):
                 if aceitar:
                     user.setdefault("amigos", []).append(solicitante_id)
                     solicitante.setdefault("amigos", []).append(logged_user)
-                    user["notificacoes"].remove(solicitante_id)
+                    notificacoes_para_remover.append(solicitante_id)
                     st.success(f"Você aceitou {solicitante.get('username', '')} como amigo.")
                     break
-                    st.rerun()
 
                 elif recusar:
-                    user["notificacoes"].remove(solicitante_id)
+                    notificacoes_para_remover.append(solicitante_id)
                     st.info(f"Você recusou {solicitante.get('username', '')}.")
                     break
-                    st.rerun()
+
+        # Remove notificações após o loop (seguro)
+        for sid in notificacoes_para_remover:
+            if sid in user["notificacoes"]:
+                user["notificacoes"].remove(sid)
+
+        # Salvar alterações
+        with open("users.json", "w") as file:
+            json.dump(users, file, indent=4)
+
+        st.rerun()
     else:
         st.write("Você não possui notificações no momento.")
-
-    # Salvar alterações
-    with open("users.json", "w") as file:
-        json.dump(users, file, indent=4)
 
 
 
