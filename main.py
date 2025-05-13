@@ -33,13 +33,29 @@ def calcular_velocidade_media(distancia, tempo):
 def calcular_forca_resultante(massa, aceleracao):
     return massa * aceleracao
 
-def calcular_bhaskara(a, b, c):
-    delta = b**2 - 4*a*c
-    if delta < 0:
-        return "Não existem raízes reais."
-    x1 = (-b + delta**0.5) / (2*a)
-    x2 = (-b - delta**0.5) / (2*a)
-    return f"x₁ = {x1:.2f}, x₂ = {x2:.2f}"
+def calculate_bhaskara(a, b, c):
+    discriminant = b**2 - 4*a*c
+    
+    if discriminant < 0:
+        st.error("Não existem raízes reais.")
+        return None, ""
+    
+    sqrt_discriminant = discriminant**0.5
+    x1 = (-b + sqrt_discriminant) / (2 * a)
+    x2 = (-b - sqrt_discriminant) / (2 * a)
+    
+    steps = f"\n## Cálculo das raízes de Bhaskara\n" \
+            f"\n### Fórmula\n" \
+            f"\n$$x = \\frac{{-b \\pm \\sqrt{{b^2 - 4ac}}}}{{2a}}$$\n" \
+            f"\n### Substituindo os valores\n" \
+            f"\n$$x = \\frac{{-{b} \\pm \\sqrt{{{b}^2 - 4({a})({c})}}}}{{2({a})}}$$\n" \
+            f"\n### Calculando o discriminante\n" \
+            f"\n$$\\Delta = {b}^2 - 4({a})({c}) = {discriminant}$$\n" \
+            f"\n### Calculando as raízes\n" \
+            f"\n$$x_1 = \\frac{{-{b} + \\sqrt{{{discriminant}}}}}{{2({a})}} = {x1:.2f}$$\n" \
+            f"\n$$x_2 = \\frac{{-{b} - \\sqrt{{{discriminant}}}}}{{2({a})}} = {x2:.2f}$$\n"
+    
+    return x1, x2, steps
 
 def calcular_corrente_eletrica(carga, tempo):
     if tempo != 0:
