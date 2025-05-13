@@ -298,7 +298,7 @@ def main():
         elif opcao == "Sair":
             logout()
     else:
-        escolha = st.sidebar.radio("Login ou Registro", ["Login", "Registrar"])
+        escolha = st.sidebar.radio("Login ou Registro", ["Login", "Registrar"], key="login_registro_radio")
         if escolha == "Login":
             login()
         else:
