@@ -1,199 +1,195 @@
 import streamlit as st
 import json
-import bcrypt
 import uuid
+import bcrypt
 import os
 
-# ===============================
-# Configuração Inicial
-# ===============================
-st.set_page_config(page_title="Sistema de Login", layout="centered")
-
-# ===============================
-# Funções Utilitárias
-# ===============================
-def carregar_usuarios():
-    if os.path.exists("users.json"):
-        with open("users.json", "r") as f:
-            return json.load(f)
-    return {}
-
-def salvar_usuarios(usuarios):
+# Carrega ou cria arquivo de dados
+if not os.path.exists("users.json"):
     with open("users.json", "w") as f:
-        json.dump(usuarios, f, indent=4)
+        json.dump({}, f)
 
-def criar_hash_senha(senha):
-    return bcrypt.hashpw(senha.encode(), bcrypt.gensalt()).decode()
+def load_users():
+    with open("users.json", "r") as f:
+        return json.load(f)
 
-def verificar_senha(senha, hash_senha):
-    return bcrypt.checkpw(senha.encode(), hash_senha.encode())
+def save_users(users):
+    with open("users.json", "w") as f:
+        json.dump(users, f, indent=4)
 
-# ===============================
-# Interface de Registro
-# ===============================
-def registrar():
-    st.title("Criar Conta")
-    novo_usuario = st.text_input("Nome de usuário")
-    nova_senha = st.text_input("Senha", type="password")
-    confirmar_senha = st.text_input("Confirmar senha", type="password")
+def hash_password(password):
+    return bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode()
 
+def check_password(password, hashed):
+    return bcrypt.checkpw(password.encode(), hashed.encode())
+
+# ---------------- Funções de cálculo ---------------- #
+
+def calcular_velocidade_media(distancia, tempo):
+    if tempo == 0:
+        return "Tempo não pode ser zero."
+    return distancia / tempo
+
+def calcular_forca_resultante(massa, aceleracao):
+    return massa * aceleracao
+
+def calcular_bhaskara(a, b, c):
+    delta = b ** 2 - 4 * a * c
+    if delta < 0:
+        return "Sem raízes reais."
+    elif delta == 0:
+        x = -b / (2 * a)
+        return f"Raiz única: x = {x}"
+    else:
+        x1 = (-b + delta ** 0.5) / (2 * a)
+        x2 = (-b - delta ** 0.5) / (2 * a)
+        return f"x₁ = {x1}, x₂ = {x2}"
+
+# ---------------- Autenticação ---------------- #
+
+def login():
+    st.subheader("Login")
+    username = st.text_input("Usuário")
+    password = st.text_input("Senha", type="password")
+    if st.button("Entrar"):
+        users = load_users()
+        for user in users.values():
+            if user["username"] == username and check_password(password, user["password"]):
+                st.session_state.logged_user = user
+                st.success("Login bem-sucedido!")
+                st.rerun()
+        st.error("Usuário ou senha inválidos.")
+
+def register():
+    st.subheader("Registrar")
+    username = st.text_input("Novo usuário")
+    password = st.text_input("Nova senha", type="password")
     if st.button("Registrar"):
-        if nova_senha != confirmar_senha:
-            st.error("As senhas não coincidem.")
-            return
-
-        usuarios = carregar_usuarios()
-
-        if novo_usuario in usuarios:
+        users = load_users()
+        if any(user["username"] == username for user in users.values()):
             st.error("Usuário já existe.")
         else:
-            usuarios[novo_usuario] = {
-                "id": str(uuid.uuid4()),
-                "senha": criar_hash_senha(nova_senha),
+            user_id = str(uuid.uuid4())
+            users[user_id] = {
+                "id": user_id,
+                "username": username,
+                "password": hash_password(password),
                 "amigos": [],
                 "notificacoes": [],
                 "anotacao": ""
             }
-            salvar_usuarios(usuarios)
-            st.success("Conta criada com sucesso! Faça login.")
+            save_users(users)
+            st.success("Registrado com sucesso! Faça login.")
 
-# ===============================
-# Interface de Login
-# ===============================
-def login():
-    st.title("Login")
-    usuario = st.text_input("Nome de usuário")
-    senha = st.text_input("Senha", type="password")
+def logout():
+    if st.button("Sair"):
+        st.session_state.logged_user = None
+        st.rerun()
 
-    if st.button("Entrar"):
-        usuarios = carregar_usuarios()
+# ---------------- Interface ---------------- #
 
-        if usuario in usuarios and verificar_senha(senha, usuarios[usuario]["senha"]):
-            st.session_state["usuario_logado"] = usuario
-            st.success("Login realizado com sucesso!")
-            st.rerun()
-        else:
-            st.error("Usuário ou senha incorretos.")
+def show_perfil(user):
+    st.title(f"Perfil: {user['username']}")
 
-# ===============================
-# Página do Perfil
-# ===============================
-def mostrar_perfil(usuario):
-    usuarios = carregar_usuarios()
-    dados = usuarios[usuario]
-
-    st.title("Perfil")
-    st.subheader(f"Bem-vindo, {usuario}!")
-
-    st.write("🔑 ID:", dados["id"])
-
-    st.text_area("📝 Anotação pessoal", value=dados.get("anotacao", ""), key="anotacao_input")
-    if st.button("Salvar Anotação"):
-        dados["anotacao"] = st.session_state.anotacao_input
-        usuarios[usuario] = dados
-        salvar_usuarios(usuarios)
+    # Anotação
+    anotacao = st.text_area("Anotação pessoal:", value=user.get("anotacao", ""))
+    if st.button("Salvar anotação"):
+        users = load_users()
+        users[user["id"]]["anotacao"] = anotacao
+        save_users(users)
         st.success("Anotação salva!")
 
-# ===============================
-# Página de Notificações
-# ===============================
-def mostrar_notificacoes(usuario):
-    usuarios = carregar_usuarios()
-    notificacoes = usuarios[usuario].get("notificacoes", [])
+    # Amigos
+    st.subheader("Amigos:")
+    if user["amigos"]:
+        for amigo_id in user["amigos"]:
+            users = load_users()
+            amigo_nome = users.get(amigo_id, {}).get("username", "Desconhecido")
+            st.text(f"- {amigo_nome}")
+    else:
+        st.info("Nenhum amigo adicionado.")
 
+    # Buscar amigo
+    st.subheader("Buscar usuário por ID")
+    search_id = st.text_input("ID do usuário")
+    if st.button("Enviar pedido de amizade"):
+        users = load_users()
+        if search_id in users and search_id != user["id"]:
+            if user["id"] not in users[search_id]["notificacoes"]:
+                users[search_id]["notificacoes"].append(user["id"])
+                save_users(users)
+                st.success("Pedido de amizade enviado!")
+            else:
+                st.warning("Você já enviou um pedido para este usuário.")
+        else:
+            st.error("ID de usuário inválido.")
+
+def show_notificacoes(user):
     st.title("Notificações")
-    if notificacoes:
-        for i, noti in enumerate(notificacoes):
-            col1, col2 = st.columns([4, 1])
-            col1.write(noti["mensagem"])
-
-            if noti["tipo"] == "convite":
-                if col2.button("Aceitar", key=f"aceitar_{i}"):
-                    usuarios[usuario]["amigos"].append(noti["de"])
-                    usuarios[usuario]["notificacoes"].pop(i)
-                    salvar_usuarios(usuarios)
-                    st.success(f"Agora você é amigo de {noti['de']}!")
-                    st.rerun()
+    users = load_users()
+    if not user["notificacoes"]:
+        st.info("Sem notificações.")
     else:
-        st.info("Nenhuma notificação no momento.")
+        for solicitante_id in user["notificacoes"]:
+            nome = users.get(solicitante_id, {}).get("username", "Desconhecido")
+            col1, col2 = st.columns(2)
+            col1.write(f"{nome} quer ser seu amigo.")
+            if col2.button("Aceitar", key=solicitante_id):
+                users[user["id"]]["amigos"].append(solicitante_id)
+                users[solicitante_id]["amigos"].append(user["id"])
+                users[user["id"]]["notificacoes"].remove(solicitante_id)
+                save_users(users)
+                st.success(f"Você e {nome} agora são amigos!")
+                st.rerun()
 
-# ===============================
-# Página de Amigos
-# ===============================
-def mostrar_amigos(usuario):
-    usuarios = carregar_usuarios()
-    amigos = usuarios[usuario].get("amigos", [])
+def show_calculos():
+    st.title("Calculadora Física")
 
-    st.title("Meus Amigos")
-    if amigos:
-        for amigo in amigos:
-            st.write(f"👤 {amigo}")
-    else:
-        st.info("Você ainda não tem amigos adicionados.")
+    with st.expander("Velocidade Média"):
+        d = st.number_input("Distância (m)", key="d_vm")
+        t = st.number_input("Tempo (s)", key="t_vm")
+        if st.button("Calcular Velocidade Média"):
+            resultado = calcular_velocidade_media(d, t)
+            st.success(f"Velocidade Média = {resultado} m/s")
 
-    st.subheader("🔍 Adicionar amigo por ID")
-    id_input = st.text_input("Digite o ID do usuário")
-    if st.button("Adicionar amigo"):
-        for user, dados in usuarios.items():
-            if dados["id"] == id_input:
-                if user == usuario:
-                    st.warning("Você não pode se adicionar.")
-                    return
-                if user in usuarios[usuario]["amigos"]:
-                    st.info("Este usuário já é seu amigo.")
-                    return
+    with st.expander("Força Resultante"):
+        m = st.number_input("Massa (kg)", key="m_fr")
+        a = st.number_input("Aceleração (m/s²)", key="a_fr")
+        if st.button("Calcular Força Resultante"):
+            resultado = calcular_forca_resultante(m, a)
+            st.success(f"Força Resultante = {resultado} N")
 
-                usuarios[user]["notificacoes"].append({
-                    "tipo": "convite",
-                    "mensagem": f"{usuario} quer ser seu amigo!",
-                    "de": usuario
-                })
-                salvar_usuarios(usuarios)
-                st.success("Convite enviado!")
-                return
+    with st.expander("Bhaskara"):
+        a = st.number_input("a", key="a_bh")
+        b = st.number_input("b", key="b_bh")
+        c = st.number_input("c", key="c_bh")
+        if st.button("Calcular Bhaskara"):
+            resultado = calcular_bhaskara(a, b, c)
+            st.success(f"Resultado: {resultado}")
 
-        st.error("Usuário não encontrado.")
+# ---------------- Execução Principal ---------------- #
 
-# ===============================
-# Logout
-# ===============================
-def logout():
-    st.session_state.pop("usuario_logado", None)
-    st.success("Logout realizado com sucesso!")
-    st.rerun()
-
-# ===============================
-# Menu Principal
-# ===============================
-def menu_principal():
-    usuario = st.session_state["usuario_logado"]
-
-    st.sidebar.title("Menu")
-    pagina = st.sidebar.selectbox("Ir para:", ["Perfil", "Amigos", "Notificações", "Sair"])
-
-    if pagina == "Perfil":
-        mostrar_perfil(usuario)
-    elif pagina == "Amigos":
-        mostrar_amigos(usuario)
-    elif pagina == "Notificações":
-        mostrar_notificacoes(usuario)
-    elif pagina == "Sair":
-        logout()
-
-# ===============================
-# Execução Principal
-# ===============================
 def main():
-    if "usuario_logado" not in st.session_state:
-        opcoes = ["Login", "Criar Conta"]
-        escolha = st.sidebar.selectbox("Menu", opcoes)
+    st.sidebar.title("Menu")
+    if "logged_user" not in st.session_state:
+        st.session_state.logged_user = None
 
-        if escolha == "Login":
-            login()
-        elif escolha == "Criar Conta":
-            registrar()
+    if st.session_state.logged_user:
+        page = st.sidebar.selectbox("Ir para:", ["Perfil", "Notificações", "Cálculos", "Sair"])
+        if page == "Perfil":
+            show_perfil(st.session_state.logged_user)
+        elif page == "Notificações":
+            show_notificacoes(st.session_state.logged_user)
+        elif page == "Cálculos":
+            show_calculos()
+        elif page == "Sair":
+            logout()
     else:
-        menu_principal()
+        menu = st.sidebar.radio("Menu", ["Login", "Registrar"])
+        if menu == "Login":
+            login()
+        elif menu == "Registrar":
+            register()
 
 if __name__ == "__main__":
     main()
