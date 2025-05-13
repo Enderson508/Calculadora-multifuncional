@@ -391,7 +391,7 @@ def show_perfil(user):
     st.title(f"Perfil: {user['username']}")
     st.subheader(f"ID: {user['id']}")
     
-    # Anotação
+    # Anotações
     anotacao = st.text_area("Anotação pessoal:", value=user.get("anotacao", ""))
     if st.button("Salvar anotação"):
         users = load_users()
