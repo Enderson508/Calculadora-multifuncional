@@ -51,6 +51,15 @@ def aba_calculos():
         if st.button("Calcular Velocidade"):
             if tempo != 0:
                 velocidade = distancia / tempo
+                # Exibição do cálculo passo a passo
+                steps = f"\n## Cálculo da Velocidade Média (m/s)\n" \
+                        f"\n### Fórmula\n" \
+                        f"\n$$v = \\frac{{\\Delta s}}{{\\Delta t}}$$\n" \
+                        f"\n### Substituindo os valores\n" \
+                        f"\n$$v = \\frac{{{distancia}}}{{{tempo}}}$$\n" \
+                        f"\n### Resultado\n" \
+                        f"\n$$v = {velocidade:.2f} \\text{{ m/s}}$$\n"
+                st.markdown(steps)
                 st.success(f"A velocidade média é {velocidade:.2f} m/s")
             else:
                 st.error("O tempo não pode ser zero!")
