@@ -226,6 +226,10 @@ def _register_section() -> None:
 # ==============================================
 def main_page() -> None:
     """Página principal após o login."""
+    if 'logged_in' not in st.session_state or not st.session_state['logged_in']:
+        st.error("Você precisa fazer login primeiro.")
+        return
+    
     st.title(f"Bem-vindo, {st.session_state['username']}!")
     st.write("Escolha uma operação física ou matemática para calcular.")
     
