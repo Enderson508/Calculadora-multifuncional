@@ -382,31 +382,6 @@ def show_notificacoes(user):
                 st.success(f"Você e {nome} agora são amigos!")
                 st.rerun()
 
-def show_calculos():
-    st.title("Calculadora Física")
-
-    with st.expander("Velocidade Média"):
-        d = st.number_input("Distância (m)", key="d_vm")
-        t = st.number_input("Tempo (s)", key="t_vm")
-        if st.button("Calcular Velocidade Média"):
-            resultado = calcular_velocidade_media(d, t)
-            st.success(f"Velocidade Média = {resultado} m/s")
-
-    with st.expander("Força Resultante"):
-        m = st.number_input("Massa (kg)", key="m_fr")
-        a = st.number_input("Aceleração (m/s²)", key="a_fr")
-        if st.button("Calcular Força Resultante"):
-            resultado = calcular_forca_resultante(m, a)
-            st.success(f"Força Resultante = {resultado} N")
-
-    with st.expander("Bhaskara"):
-        a = st.number_input("a", key="a_bh")
-        b = st.number_input("b", key="b_bh")
-        c = st.number_input("c", key="c_bh")
-        if st.button("Calcular Bhaskara"):
-            resultado = calcular_bhaskara(a, b, c)
-            st.success(f"Resultado: {resultado}")
-
 # ---------------- Execução Principal ---------------- #
 
 def main():
