@@ -41,7 +41,7 @@ def aba_calculos():
         "Carga Elétrica",
         "Tempo"
     ]
-    
+
     escolha = st.selectbox("Escolha o tipo de cálculo:", opcoes)
 
     if escolha == "Velocidade Média":
@@ -51,14 +51,15 @@ def aba_calculos():
         if st.button("Calcular Velocidade"):
             if tempo != 0:
                 velocidade = distancia / tempo
-                # Exibição do cálculo passo a passo
-                steps = f"\n## Cálculo da Velocidade Média (m/s)\n" \
-                        f"\n### Fórmula\n" \
-                        f"\n$$v = \\frac{{\\Delta s}}{{\\Delta t}}$$\n" \
-                        f"\n### Substituindo os valores\n" \
-                        f"\n$$v = \\frac{{{distancia}}}{{{tempo}}}$$\n" \
-                        f"\n### Resultado\n" \
-                        f"\n$$v = {velocidade:.2f} \\text{{ m/s}}$$\n"
+                steps = f"""
+                ## Cálculo da Velocidade Média (m/s)
+                ### Fórmula
+                $$v = \frac{{\Delta s}}{{\Delta t}}$$
+                ### Substituindo os valores
+                $$v = \frac{{{distancia}}}{{{tempo}}}$$
+                ### Resultado
+                $$v = {velocidade:.2f} \\text{{ m/s}}$$
+                """
                 st.markdown(steps)
                 st.success(f"A velocidade média é {velocidade:.2f} m/s")
             else:
@@ -70,6 +71,16 @@ def aba_calculos():
         aceleracao = st.number_input("Digite a aceleração (a) em m/s²:", step=1.0)
         if st.button("Calcular Força"):
             forca = massa * aceleracao
+            steps = f"""
+            ## Cálculo da Força Resultante (N)
+            ### Fórmula
+            $$F = m \cdot a$$
+            ### Substituindo os valores
+            $$F = {massa} \cdot {aceleracao}$$
+            ### Resultado
+            $$F = {forca:.2f} \\text{{ N}}$$
+            """
+            st.markdown(steps)
             st.success(f"A força resultante é {forca:.2f} N")
 
     elif escolha == "Fórmula de Bhaskara":
@@ -84,6 +95,16 @@ def aba_calculos():
             else:
                 x1 = (-b + delta**0.5) / (2*a)
                 x2 = (-b - delta**0.5) / (2*a)
+                steps = f"""
+                ## Cálculo de Bhaskara
+                ### Fórmula
+                $$x = \frac{{-b \pm \sqrt{{\Delta}}}}{{2a}}$$
+                ### Substituindo os valores
+                $$\Delta = {b}^2 - 4 \cdot {a} \cdot {c} = {delta}$$
+                $$x_1 = \frac{{{-b} + \sqrt{{{delta}}}}}{{2 \cdot {a}}} = {x1:.2f}$$
+                $$x_2 = \frac{{{-b} - \sqrt{{{delta}}}}}{{2 \cdot {a}}} = {x2:.2f}$$
+                """
+                st.markdown(steps)
                 st.success(f"x₁ = {x1:.2f}, x₂ = {x2:.2f}")
 
     elif escolha == "Corrente Elétrica":
@@ -93,31 +114,19 @@ def aba_calculos():
         if st.button("Calcular Corrente"):
             if tempo != 0:
                 corrente = carga / tempo
+                steps = f"""
+                ## Cálculo da Corrente Elétrica (A)
+                ### Fórmula
+                $$I = \frac{{Q}}{{\Delta t}}$$
+                ### Substituindo os valores
+                $$I = \frac{{{carga}}}{{{tempo}}}$$
+                ### Resultado
+                $$I = {corrente:.2f} \\text{{ A}}$$
+                """
+                st.markdown(steps)
                 st.success(f"A corrente elétrica é {corrente:.2f} A")
             else:
                 st.error("O tempo não pode ser zero!")
-
-    elif escolha == "Área de Figuras Geométricas":
-        figura = st.selectbox("Escolha a figura:", ["Quadrado", "Retângulo", "Triângulo", "Círculo"])
-        if figura == "Quadrado":
-            lado = st.number_input("Digite o lado:", step=1.0)
-            if st.button("Calcular Área do Quadrado"):
-                st.success(f"A área é {lado ** 2:.2f}")
-        elif figura == "Retângulo":
-            base = st.number_input("Base:", step=1.0)
-            altura = st.number_input("Altura:", step=1.0)
-            if st.button("Calcular Área do Retângulo"):
-                st.success(f"A área é {base * altura:.2f}")
-        elif figura == "Triângulo":
-            base = st.number_input("Base:", step=1.0)
-            altura = st.number_input("Altura:", step=1.0)
-            if st.button("Calcular Área do Triângulo"):
-                st.success(f"A área é {(base * altura) / 2:.2f}")
-        elif figura == "Círculo":
-            raio = st.number_input("Raio:", step=1.0)
-            if st.button("Calcular Área do Círculo"):
-                area = 3.1416 * raio ** 2
-                st.success(f"A área é {area:.2f}")
 
     elif escolha == "Força Gravitacional":
         st.subheader("Força Gravitacional: F = G * (m1 * m2) / d²")
@@ -128,6 +137,16 @@ def aba_calculos():
         if st.button("Calcular Força Gravitacional"):
             if distancia != 0:
                 Fg = G * (m1 * m2) / distancia**2
+                steps = f"""
+                ## Cálculo da Força Gravitacional (N)
+                ### Fórmula
+                $$F = G \cdot \frac{{m_1 \cdot m_2}}{{d^2}}$$
+                ### Substituindo os valores
+                $$F = {G:.4e} \cdot \frac{{{m1} \cdot {m2}}}{{{distancia}^2}}$$
+                ### Resultado
+                $$F = {Fg:.4e} \\text{{ N}}$$
+                """
+                st.markdown(steps)
                 st.success(f"A força gravitacional é {Fg:.4e} N")
             else:
                 st.error("A distância não pode ser zero!")
@@ -141,6 +160,16 @@ def aba_calculos():
             vf2 = v0**2 + 2*a*s
             if vf2 >= 0:
                 vf = vf2 ** 0.5
+                steps = f"""
+                ## Cálculo de Torricelli
+                ### Fórmula
+                $$v^2 = v_0^2 + 2a\Delta s$$
+                ### Substituindo os valores
+                $$v^2 = {v0}^2 + 2 \cdot {a} \cdot {s}$$
+                ### Resultado
+                $$v = {vf:.2f} \\text{{ m/s}}$$
+                """
+                st.markdown(steps)
                 st.success(f"A velocidade final é {vf:.2f} m/s")
             else:
                 st.warning("Resultado inválido (velocidade imaginária).")
@@ -148,9 +177,19 @@ def aba_calculos():
     elif escolha == "Carga Elétrica":
         st.subheader("Carga Elétrica: Q = n * e")
         n = st.number_input("Número de elétrons (n):", step=1.0)
-        e = 1.6e-19  # Carga elementar
+        e = 1.6e-19
         if st.button("Calcular Carga"):
             Q = n * e
+            steps = f"""
+            ## Cálculo da Carga Elétrica (C)
+            ### Fórmula
+            $$Q = n \cdot e$$
+            ### Substituindo os valores
+            $$Q = {n} \cdot {e}$$
+            ### Resultado
+            $$Q = {Q:.4e} \\text{{ C}}$$
+            """
+            st.markdown(steps)
             st.success(f"A carga elétrica é {Q:.4e} C")
 
     elif escolha == "Tempo":
@@ -160,6 +199,16 @@ def aba_calculos():
         if st.button("Calcular Tempo"):
             if v != 0:
                 t = d / v
+                steps = f"""
+                ## Cálculo do Tempo (s)
+                ### Fórmula
+                $$t = \frac{{d}}{{v}}$$
+                ### Substituindo os valores
+                $$t = \frac{{{d}}}{{{v}}}$$
+                ### Resultado
+                $$t = {t:.2f} \\text{{ s}}$$
+                """
+                st.markdown(steps)
                 st.success(f"O tempo é {t:.2f} s")
             else:
                 st.error("A velocidade não pode ser zero!")
