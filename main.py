@@ -365,23 +365,6 @@ def show_perfil(user):
         else:
             st.error("ID de usuário inválido.")
 
-def enviar_pedido_amizade(usuario_logado_id, id_destino):
-    with open("users.json", "r") as file:
-        users = json.load(file)
-
-    user_origem = next((u for u in users if u.get("id") == usuario_logado_id), None)
-    user_destino = next((u for u in users if u.get("id") == id_destino), None)
-
-    if user_origem and user_destino:
-        if usuario_logado_id not in user_destino.get("notificacoes", []):
-            user_destino.setdefault("notificacoes", []).append(usuario_logado_id)
-
-        with open("users.json", "w") as file:
-            json.dump(users, file, indent=4)
-
-        st.success(f"Pedido de amizade enviado para {user_destino.get('username', 'usuário')}!")
-    else:
-        st.error("Usuário não encontrado.")
 
 def show_notificacoes(logged_user):
     st.subheader("Notificações")
