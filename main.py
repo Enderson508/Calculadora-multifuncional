@@ -104,8 +104,8 @@ def aba_calculos():
                 x1 = (-b + delta**0.5) / (2*a)
                 x2 = (-b - delta**0.5) / (2*a)
                 steps += f"\n### Cálculo das Raízes\n" \
-                         f"\n$$x_1 = \\frac{{-b + \\sqrt{{\\Delta}}}}{{2a}} = \\frac{{-{b} + \\sqrt{{{delta:.2f}}}}{{2 \\times {a}}} = {x1:.2f}$$\n" \
-                         f"\n$$x_2 = \\frac{{-b - \\sqrt{{\\Delta}}}}{{2a}} = \\frac{{-{b} - \\sqrt{{{delta:.2f}}}}{{2 \\times {a}}} = {x2:.2f}$$\n" \
+                         f"\n$$x_1 = \\frac{{-b + \\sqrt{{\\Delta}}}}{{2a}} = \\frac{{-{b} + \\sqrt{{{delta:.2f}}}}}{{2 \\times {a}}} = {x1:.2f}$$\n" \
+                         f"\n$$x_2 = \\frac{{-b - \\sqrt{{\\Delta}}}}{{2a}} = \\frac{{-{b} - \\sqrt{{{delta:.2f}}}}}{{2 \\times {a}}} = {x2:.2f}$$\n" \
                          f"\n### Resultado\n" \
                          f"\n$$x_1 = {x1:.2f}$$\n" \
                          f"\n$$x_2 = {x2:.2f}$$\n"
