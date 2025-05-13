@@ -4,7 +4,7 @@ import uuid
 import bcrypt
 import os
 
-# Carrega ou cria arquivo de dados
+# Carrega ou cria arquivo de dadoss
 if not os.path.exists("users.json"):
     with open("users.json", "w") as f:
         json.dump({}, f)
