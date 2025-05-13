@@ -328,6 +328,65 @@ def logout():
 
 # ---------------- Interface ---------------- #
 
+def show_notificacoes(logged_user):
+    st.subheader("Notificações")
+    
+    # Carrega todos os usuários
+    users = load_users()
+    
+    # Verifica se o usuário logado existe no sistema
+    if logged_user["id"] not in users:
+        st.error("Erro: seu usuário não foi encontrado no sistema!")
+        return
+    
+    user = users[logged_user["id"]]
+    
+    # Garante que o usuário tem a lista de notificações
+    if "notificacoes" not in user:
+        user["notificacoes"] = []
+    
+    # Verifica se há notificações
+    if not user["notificacoes"]:
+        st.info("Você não tem notificações no momento.")
+        return
+    
+    # Processa cada notificação
+    for solicitante_id in user["notificacoes"].copy():  # Usamos copy() para iterar sobre uma cópia
+        if solicitante_id not in users:
+            # Remove IDs inválidos
+            user["notificacoes"].remove(solicitante_id)
+            continue
+            
+        solicitante = users[solicitante_id]
+        st.markdown(f"**{solicitante['username']}** quer ser seu amigo.")
+        
+        col1, col2 = st.columns(2)
+        with col1:
+            if st.button(f"Aceitar {solicitante['username']}", key=f"aceitar_{solicitante_id}"):
+                # Adiciona como amigo em ambos os usuários
+                if "amigos" not in user:
+                    user["amigos"] = []
+                if "amigos" not in solicitante:
+                    solicitante["amigos"] = []
+                
+                if solicitante_id not in user["amigos"]:
+                    user["amigos"].append(solicitante_id)
+                if user["id"] not in solicitante["amigos"]:
+                    solicitante["amigos"].append(user["id"])
+                
+                # Remove a notificação
+                user["notificacoes"].remove(solicitante_id)
+                save_users(users)
+                st.success(f"Você e {solicitante['username']} agora são amigos!")
+                st.rerun()
+        
+        with col2:
+            if st.button(f"Recusar {solicitante['username']}", key=f"recusar_{solicitante_id}"):
+                user["notificacoes"].remove(solicitante_id)
+                save_users(users)
+                st.info(f"Pedido de {solicitante['username']} recusado.")
+                st.rerun()
+
 def show_perfil(user):
     st.title(f"Perfil: {user['username']}")
     st.subheader(f"ID: {user['id']}")
@@ -342,11 +401,13 @@ def show_perfil(user):
 
     # Amigos
     st.subheader("Amigos:")
-    if user["amigos"]:
+    if "amigos" in user and user["amigos"]:
+        users = load_users()
         for amigo_id in user["amigos"]:
-            users = load_users()
-            amigo_nome = users.get(amigo_id, {}).get("username", "Desconhecido")
-            st.text(f"- {amigo_nome}")
+            if amigo_id in users:
+                st.write(f"- {users[amigo_id]['username']}")
+            else:
+                st.write(f"- Usuário desconhecido (ID: {amigo_id})")
     else:
         st.info("Nenhum amigo adicionado.")
 
@@ -355,63 +416,27 @@ def show_perfil(user):
     search_id = st.text_input("ID do usuário")
     if st.button("Enviar pedido de amizade"):
         users = load_users()
-        if search_id in users and search_id != user["id"]:
-            if user["id"] not in users[search_id]["notificacoes"]:
-                users[search_id]["notificacoes"].append(user["id"])
-                save_users(users)
-                st.success("Pedido de amizade enviado!")
-            else:
-                st.warning("Você já enviou um pedido para este usuário.")
+        
+        if not search_id:
+            st.error("Por favor, insira um ID válido")
+        elif search_id == user["id"]:
+            st.error("Você não pode adicionar a si mesmo como amigo")
+        elif search_id not in users:
+            st.error("ID de usuário não encontrado")
         else:
-            st.error("ID de usuário inválido.")
-
-
-def show_notificacoes(logged_user):
-    st.subheader("Notificações")
-
-    with open("users.json", "r") as file:
-        users = json.load(file)
-
-    # Verificação do usuário logado
-    user = next((u for u in users if isinstance(u, dict) and u.get("id") == logged_user), None)
-
-    if user and isinstance(user.get("notificacoes", []), list) and user["notificacoes"]:
-        notificacoes_para_remover = []
-
-        for solicitante_id in user["notificacoes"]:
-            solicitante = next((u for u in users if isinstance(u, dict) and u.get("id") == solicitante_id), None)
-            if solicitante:
-                col1, col2 = st.columns([3, 1])
-                with col1:
-                    st.write(f"**{solicitante.get('username', 'Usuário desconhecido')}** quer ser seu amigo.")
-                with col2:
-                    aceitar = st.button("Aceitar", key=f"aceitar_{solicitante_id}")
-                    recusar = st.button("Recusar", key=f"recusar_{solicitante_id}")
-
-                if aceitar:
-                    user.setdefault("amigos", []).append(solicitante_id)
-                    solicitante.setdefault("amigos", []).append(logged_user)
-                    notificacoes_para_remover.append(solicitante_id)
-                    st.success(f"Você aceitou {solicitante.get('username', '')} como amigo.")
-                    break
-
-                elif recusar:
-                    notificacoes_para_remover.append(solicitante_id)
-                    st.info(f"Você recusou {solicitante.get('username', '')}.")
-                    break
-
-        # Remove notificações após o loop (seguro)
-        for sid in notificacoes_para_remover:
-            if sid in user["notificacoes"]:
-                user["notificacoes"].remove(sid)
-
-        # Salvar alterações
-        with open("users.json", "w") as file:
-            json.dump(users, file, indent=4)
-
-        st.rerun()
-    else:
-        st.write("Você não possui notificações no momento.")
+            target_user = users[search_id]
+            
+            # Inicializa notificações se não existirem
+            if "notificacoes" not in target_user:
+                target_user["notificacoes"] = []
+            
+            # Verifica se já existe um pedido pendente
+            if user["id"] in target_user["notificacoes"]:
+                st.warning("Você já enviou um pedido para este usuário")
+            else:
+                target_user["notificacoes"].append(user["id"])
+                save_users(users)
+                st.success("Pedido de amizade enviado com sucesso!")
 
 
 
